@@ -9,6 +9,8 @@ type MidJourneyServiceConfig struct {
 
 	DiscordChannelId string `mapstructure:"discordChannelId"` // midjourney channel id
 
+	DiscordServerId string `mapstructure:"discordServerId"` // midjourney server id
+
 	DiscordSessionId string `mapstructure:"discordSessionId"` // midjourney session id
 
 	UpscaleCount int `mapstructure:"upscaleCount"`
@@ -19,12 +21,13 @@ type InteractionRequestWrapper struct {
 }
 
 type InteractionRequest struct {
-	Type          int                    `json:"type"`
-	ApplicationID string                 `json:"application_id"`
-	ChannelID     string                 `json:"channel_id"`
-	SessionID     string                 `json:"session_id"`
-	Data          InteractionRequestData `json:"data"`
-	Nonce         string                 `json:"nonce"`
+	Type            int                    `json:"type"`
+	ApplicationID   string                 `json:"application_id"`
+	DiscordServerId string                 `json:"guild_id"`
+	ChannelID       string                 `json:"channel_id"`
+	SessionID       string                 `json:"session_id"`
+	Data            InteractionRequestData `json:"data"`
+	Nonce           string                 `json:"nonce"`
 }
 
 type UpSampleData struct {
@@ -33,13 +36,14 @@ type UpSampleData struct {
 }
 
 type InteractionRequestTypeThree struct {
-	Type          int         `json:"type"`
-	ChannelID     string      `json:"channel_id"`
-	MessageFlags  int         `json:"message_flags"`
-	MessageID     string      `json:"message_id"`
-	ApplicationID string      `json:"application_id"`
-	SessionID     string      `json:"session_id"`
-	Data          interface{} `json:"data"`
+	Type            int         `json:"type"`
+	DiscordServerId string      `json:"guild_id"`
+	ChannelID       string      `json:"channel_id"`
+	MessageFlags    int         `json:"message_flags"`
+	MessageID       string      `json:"message_id"`
+	ApplicationID   string      `json:"application_id"`
+	SessionID       string      `json:"session_id"`
+	Data            interface{} `json:"data"`
 }
 
 type InteractionRequestData struct {

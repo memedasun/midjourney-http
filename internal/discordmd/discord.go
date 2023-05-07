@@ -134,6 +134,13 @@ func (m *MidJourneyService) Start(c MidJourneyServiceConfig) {
 
 // when receive message from discord
 func (m *MidJourneyService) onDiscordMessage(s *discordgo.Session, message *discordgo.MessageCreate) {
+	m.rwLock.Lock()
+	defer m.rwLock.Unlock()
+
+	if message.ChannelID != m.config.DiscordChannelId {
+		return
+	}
+
 	if len(message.Embeds) > 0 {
 		for _, embed := range message.Embeds {
 			if embed.Title == "Blocked" || embed.Title == "Banned prompt" || embed.Title == "Invalid parameter" || embed.Title == "Banned prompt detected" || embed.Title == "Invalid link" {
@@ -156,8 +163,6 @@ func (m *MidJourneyService) onDiscordMessage(s *discordgo.Session, message *disc
 		}
 	}
 
-	m.rwLock.Lock()
-	defer m.rwLock.Unlock()
 	for _, attachment := range message.Attachments {
 		if message.ReferencedMessage == nil {
 			// receive origin image
@@ -225,10 +230,11 @@ func (m *MidJourneyService) imagineRequest(taskId string, prompt string) int {
 		Value: prompt,
 	})
 	payload := InteractionRequest{
-		Type:          2,
-		ApplicationID: imagineCommand.ApplicationID,
-		ChannelID:     m.config.DiscordChannelId,
-		SessionID:     m.config.DiscordSessionId,
+		Type:            2,
+		ApplicationID:   imagineCommand.ApplicationID,
+		DiscordServerId: m.config.DiscordServerId,
+		ChannelID:       m.config.DiscordChannelId,
+		SessionID:       m.config.DiscordSessionId,
 		Data: InteractionRequestData{
 			Version:            imagineCommand.Version,
 			ID:                 imagineCommand.ID,
@@ -244,12 +250,13 @@ func (m *MidJourneyService) imagineRequest(taskId string, prompt string) int {
 
 func (m *MidJourneyService) upscaleRequest(id string, index int, messageId string) int {
 	payload := InteractionRequestTypeThree{
-		Type:          3,
-		MessageFlags:  0,
-		MessageID:     messageId,
-		ApplicationID: m.config.DiscordAppId,
-		ChannelID:     m.config.DiscordChannelId,
-		SessionID:     m.config.DiscordSessionId,
+		Type:            3,
+		MessageFlags:    0,
+		MessageID:       messageId,
+		ApplicationID:   m.config.DiscordAppId,
+		DiscordServerId: m.config.DiscordServerId,
+		ChannelID:       m.config.DiscordChannelId,
+		SessionID:       m.config.DiscordSessionId,
 		Data: UpSampleData{
 			ComponentType: 2,
 			CustomID:      fmt.Sprintf("MJ::JOB::upsample::%d::%s", index, id),
